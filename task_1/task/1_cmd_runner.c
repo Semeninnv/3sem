@@ -19,9 +19,9 @@ int main() {
   int status, a, pid, i, i1, k;
   char *arg[N];
   char c;
-  while(1){
-    for(i = 0; i < N; i++)
+  for(i = 0; i < N; i++)
       arg[i] = (char*) malloc(N);
+  while(1){
     printf("Enter a file path with arguments. Type \"quit\" to exit\n");
     i = 0;
     k = 0;

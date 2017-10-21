@@ -12,7 +12,7 @@ int main(){
   char bufp[4096];
   char bufc[4096];
   dpipe_t dup;
-  int pid, ppid, sizep, sizec, writtenp, writtenc;
+  int pid, sizep, sizec;
   if (pipe(dup.tdx)<0){
     printf("Pipe error\n");
     return -1;
@@ -32,7 +32,6 @@ int main(){
     return -1;
   }
   else if (pid == 0) {
-    ppid = getppid();
     close(dup.tdx[1]);
     close(dup.rdx[0]);
     while(1){

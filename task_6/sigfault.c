@@ -8,6 +8,12 @@ char c;
 int fd1, fd2, i = 128;
 pid_t pid;
 int bits = 8;
+void sigt(int signum){
+  printf("SIGTERM received\n");
+  close(fd1);
+  close(fd2);
+  exit(0);
+}
 void sigfault(int signum){
   if (pid == 0){ //child handler
     if (signum == SIGUSR1){
@@ -16,6 +22,7 @@ void sigfault(int signum){
         i = 128;
         if((read(fd1, &c, 1)) == 0){
             close(fd1);
+            close(fd2);
             exit(0);
         }
       }
@@ -49,18 +56,22 @@ void sigfault(int signum){
   }
 }
 void sigc(int signum){
-  write(fd2, &c, 1);
+  printf("SIGCHLD received\n");
+  if(bits == 8)
+    write(fd2, &c, 1);
+  close(fd1);
   close(fd2);
   exit(0);
 }
 int main(int argc, char *argv[]){
-  struct sigaction act1;
-  struct sigaction act2;
+  struct sigaction act1, act2, act3;
   act1.sa_handler = sigfault;
   sigaction(SIGUSR1, &act1, NULL);
   sigaction(SIGUSR2, &act1, NULL);
   act2.sa_handler = sigc;
   sigaction(SIGCHLD, &act2, NULL);
+  act3.sa_handler = sigt;
+  sigaction(SIGTERM, &act3, NULL);
   fd1 = open(argv[1], O_RDONLY);
   fd2 = open(argv[2], O_CREAT|O_TRUNC|O_WRONLY, 0777);
   pid = fork();
